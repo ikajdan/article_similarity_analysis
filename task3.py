@@ -7,9 +7,6 @@ from gensim import corpora, models
 from gensim.similarities import MatrixSimilarity
 from nltk.tokenize import word_tokenize
 
-# List of related words
-RELATED_WORDS_SPORT = ["sport", "game"]
-
 
 def download_nltk_data():
     nltk_data_dir = os.path.join(os.getcwd(), "nltk_data")
@@ -26,13 +23,6 @@ def normalize_text(text):
         return ""  # Treat non-string values as empty strings
     tokens = word_tokenize(text.lower())
     return tokens
-
-
-def contains_related_words(text, related_words):
-    if not isinstance(text, str):
-        return False
-    text = text.lower()  # Ensure comparison is case insensitive
-    return any(word in text for word in related_words)
 
 
 def create_corpus(df):
@@ -57,8 +47,10 @@ def calculate_lda(corpus, num_topics=30, passes=2, random_state=42):
     return lda_model, dictionary, similarity_index
 
 
-def is_sport_related(description, related_words):
-    return contains_related_words(description, related_words)
+def is_sport_section(article_section):
+    if not isinstance(article_section, str):
+        return False
+    return "sports" in article_section.lower()
 
 
 def get_top_similar_articles_tfidf(tfidf_model, dictionary, similarity_index, article):
@@ -75,13 +67,12 @@ def get_top_similar_articles_lda(lda_model, dictionary, similarity_index, articl
     return sorted(enumerate(sims), key=lambda item: -item[1])[:10]
 
 
-def calculate_quality_ratio(
-    df, related_words, model, dictionary, similarity_index, method
-):
-    num_articles_sport_related = df[df["is_sport_related"]].shape[0]
+def calculate_quality_ratio(df, model, dictionary, similarity_index, method):
+    sports_articles = df[df["is_sport_section"]]
+    num_articles_sport_related = sports_articles.shape[0]
     total_goods = 0
 
-    for description in df[df["is_sport_related"]]["description"]:
+    for description in sports_articles["description"]:
         if method == "tfidf":
             top_10 = get_top_similar_articles_tfidf(
                 model, dictionary, similarity_index, description
@@ -91,11 +82,7 @@ def calculate_quality_ratio(
                 model, dictionary, similarity_index, description
             )
 
-        goods = sum(
-            1
-            for index, _ in top_10
-            if contains_related_words(df.iloc[index]["description"], related_words)
-        )
+        goods = sum(1 for index, _ in top_10 if df.iloc[index]["is_sport_section"])
         total_goods += goods
 
     if num_articles_sport_related == 0:
@@ -110,6 +97,9 @@ def main():
 
     # Load the dataset
     df = pd.read_csv("data.csv")
+
+    # Mark articles that belong to the 'Sports' section
+    df["is_sport_section"] = df["article_section"].apply(is_sport_section)
 
     # Create a corpus from the descriptions
     corpus = create_corpus(df)
@@ -126,37 +116,30 @@ def main():
     )
     print(f"LDA model creation time: {time() - start_time:.4f} seconds")
 
-    # Mark sport-related articles
-    df["is_sport_related"] = df["description"].apply(
-        lambda desc: is_sport_related(desc, RELATED_WORDS_SPORT)
-    )
-
-    # Calculate the quality ratio for sport-related content (TF-IDF)
+    # Calculate the quality ratio for 'Sports' section content (TF-IDF)
     start_time = time()
     quality_ratio_tfidf = calculate_quality_ratio(
         df,
-        RELATED_WORDS_SPORT,
         tfidf_model,
         dictionary,
         tfidf_similarity_index,
         method="tfidf",
     )
     print(
-        f"TF-IDF quality ratio for 'Sport': {quality_ratio_tfidf:.3f} (in {time() - start_time:.4f} seconds)"
+        f"TF-IDF quality ratio for 'Sports': {quality_ratio_tfidf:.3f} (in {time() - start_time:.4f} seconds)"
     )
 
-    # Calculate the quality ratio for sport-related content (LDA)
+    # Calculate the quality ratio for 'Sports' section content (LDA)
     start_time = time()
     quality_ratio_lda = calculate_quality_ratio(
         df,
-        RELATED_WORDS_SPORT,
         lda_model,
         lda_dictionary,
         lda_similarity_index,
         method="lda",
     )
     print(
-        f"LDA quality ratio for 'Sport': {quality_ratio_lda:.3f} (in {time() - start_time:.4f} seconds)"
+        f"LDA quality ratio for 'Sports': {quality_ratio_lda:.3f} (in {time() - start_time:.4f} seconds)"
     )
 
 

@@ -54,10 +54,10 @@ ratio_quality = total_goods/(num_articles_food_and_drink*10)
 
 ---
 
-Creation of the TF-IDF model took 7.3811 seconds, and the quality ratio calculation took 72.9012 seconds. The quality ratio for the topic "Food and Related" was 0.39. The quality ratio is calculated by counting how many articles in the top-10 most similar articles are related to the topic "Food and Drink" and dividing it by the total number of articles related to "Food and Drink" multiplied by 10.
+Creation of the TF-IDF model took 7.1708 seconds, and the quality ratio calculation took 13.6743 seconds. The quality ratio for the topic "Food and Related" was 0.566. The quality ratio is calculated by counting how many articles in the top-10 most similar articles are related to the topic "Food and Drink" and dividing it by the total number of articles related to "Food and Drink" multiplied by 10.
 
-- TF-IDF model creation time: 7.5356 seconds
-- Quality ratio for 'Food and Drinks': 0.388 (in 79.0590 seconds)
+- TF-IDF model creation time: 7.1708 seconds
+- Quality ratio for 'Food and Drink': 0.566 (in 13.6743 seconds)
 
 ## Task 2
 
@@ -71,10 +71,10 @@ Creation of the TF-IDF model took 7.3811 seconds, and the quality ratio calculat
 
 TF-IDF focuses on word frequency and gives more weight to terms that appear frequently in a document but less frequently across the corpus. On the other hand, LDA discovers latent topics in documents and represents documents in a probabilistic space of topics. Therefore, TF-IDF will likely perform better for tasks that are directly related to word matching. LDA might capture hidden relationships between words (topics) and could potentially identify relevant articles that don’t explicitly mention the related words (in this case food and drink), but are still thematically related.
 
-- TF-IDF model creation time: 7.2878 seconds
-- LDA model creation time: 52.2442 seconds
-- TF-IDF quality ratio for 'Food and Drinks': 0.388 (in 72.6243 seconds)
-- LDA quality ratio for 'Food and Drinks': 0.329 (in 11.3164 seconds)
+- TF-IDF model creation time: 10.0764 seconds
+- LDA model creation time: 52.6284 seconds
+- TF-IDF quality ratio for 'Food and Drink': 0.566 (in 12.6290 seconds)
+- LDA quality ratio for 'Food and Drink': 0.375 (in 1.5174 seconds)
 
 ## Task 3
 
@@ -88,10 +88,10 @@ TF-IDF focuses on word frequency and gives more weight to terms that appear freq
 
 The quality of the results for the topic "Sports" is worse than the ones obtained with the topic "Food and Drink" because the articles related to sports are likely to be more diverse and cover a wider range of topics compared to the articles related to food and drink. This diversity makes it harder for the algorithms to identify relevant articles based on the similarity of their content. The topic "Food and Drink" is more specific and has a narrower focus, making it easier for the algorithms to identify related articles.
 
-- TF-IDF model creation time: 7.1060 seconds
-- LDA model creation time: 51.6410 seconds
-- TF-IDF quality ratio for 'Sport': 0.358 (in 98.7607 seconds)
-- LDA quality ratio for 'Sport': 0.259 (in 19.3900 seconds)
+- TF-IDF model creation time: 7.9072 seconds
+- LDA model creation time: 53.8201 seconds
+- TF-IDF quality ratio for 'Sports': 0.416 (in 10.5686 seconds)
+- LDA quality ratio for 'Sports': 0.186 (in 1.1122 seconds)
 
 ## Task 4
 
@@ -133,7 +133,7 @@ The top 50 most frequent words in the dataset for the "sport" and "game" are as 
 The words were then hand-picked to create a list of keywords that are more specific to the topics "Food and Drink":
 
 ```python
-RELATED_WORDS_FOOD = [
+food_related_words = [
     "food",
     "drink",
     "eat",
@@ -145,7 +145,7 @@ RELATED_WORDS_FOOD = [
 and "Sports":
 
 ```python
-RELATED_WORDS_SPORTS = [
+sport_related_words = [
     "game",
     "team",
     "sports",
